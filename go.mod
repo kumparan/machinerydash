@@ -8,3 +8,5 @@ require (
 	github.com/labstack/echo/v4 v4.1.17
 	github.com/sirupsen/logrus v1.4.2
 )
+
+replace github.com/RichardKnop/machinery => github.com/kumparan/machinery v1.9.3-0.20201201044207-622871067cce

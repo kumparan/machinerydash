@@ -27,6 +27,7 @@
             <th>Task</th>
             <th>Signature</th>
             <th>Error</th>
+            <th>Action</th>
         </thead>
         
         <tbody>
@@ -35,9 +36,34 @@
                 <td>{{ .TaskName }}</td>
                 <td><pre class="pre-scrollable">{{ .Signature }}</pre></td>
                 <td>{{ .Error }}</td>
+            <td><button onclick="rereun({{ .Signature }})">Rerun</button></td>
             </tr>
             {{end}}
         </tbody>
     </table>
+
+    <script>
+        function rereun(signature) {
+            let payload = { signature: signature }
+
+            console.info("POST /reenqueue", payload)
+
+            fetch("/reenqueue", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload),
+            })
+            .then(res => res.json())
+            .then(res => {
+                console.log(res)
+            })
+            .catch(err => {
+                console.error(err)
+            })
+        }
+    </script>
+
 </body>
 </html>

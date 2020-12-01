@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"html/template"
 	"io"
 	"net/http"
@@ -51,12 +52,17 @@ func main() {
 	e := echo.New()
 	e.Renderer = &htmlTemplate{template.Must(template.ParseGlob("views/*.html"))}
 
-	e.GET("/", index)
-	e.GET("/ping", func(c echo.Context) error {
-		return c.String(http.StatusOK, "pong")
-	})
 	e.Static("/static", "public")
+
+	e.GET("/", index)
+	e.GET("/ping", ping)
+	e.POST("/reenqueue", reEnqueue)
+
 	e.Logger.Fatal(e.Start(":9000"))
+}
+
+func ping(ec echo.Context) error {
+	return ec.String(http.StatusOK, "pong")
 }
 
 func index(ec echo.Context) error {
@@ -72,4 +78,20 @@ func index(ec echo.Context) error {
 		TaskStates []*dashboard.TaskWithSignature
 	}{taskStates}
 	return ec.Render(http.StatusOK, "index.html", data)
+}
+
+func reEnqueue(ec echo.Context) error {
+	sig := tasks.Signature{}
+	req := struct {
+		Signature string `json:"signature"`
+	}{}
+	json.Unmarshal([]byte(req.Signature), &sig)
+
+	err := machineryDash.ReEnqueueTask(&sig)
+	if err != nil {
+		logrus.Errorf("failed to ReEnqueueTask: %w", err)
+		return ec.JSON(http.StatusInternalServerError, "failed to reenqueue task")
+	}
+
+	return ec.JSON(http.StatusOK, map[string]string{"message": "ok"})
 }

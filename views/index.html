@@ -15,35 +15,55 @@
             white-space: -pre-wrap;
             white-space: -o-pre-wrap;
             word-wrap: break-word;
-            max-width: 512px;
+            max-width: 300px;
         }
     </style>
 </head>
 <body class="container">
     <h1>Machinary Dashboard</h1>
 
+    <div style="display: flex;align-items: baseline;justify-content: space-between;">
+        <h2 style="text-transform: capitalize;">{{ .CurrentState }} Task</h2>
+        
+        <div>
+            {{ range .ListStates }}
+                <a style="padding-right: 8px;" href="/?state={{ . }}">{{ . }}</a>
+            {{ end }}
+        </div>
+    </div>
+
+
     <table class="table">
         <thead>
+            <th>TaskUUID</th>
             <th>Task</th>
             <th>Signature</th>
             <th>Error</th>
+            <th>CreatedAt</th>
             <th>Action</th>
         </thead>
         
         <tbody>
+            {{ $enableReEnqueu := .EnableReEnqueu }}
             {{range .TaskStates}}
             <tr>
+                <td style="padding:4px; max-width: 100px"><code>{{ .TaskUUID }}</code></td>
                 <td>{{ .TaskName }}</td>
                 <td><pre class="pre-scrollable">{{ .Signature }}</pre></td>
-                <td>{{ .Error }}</td>
-            <td><button onclick="rereun({{ .Signature }})">Rerun</button></td>
+                <td><code>{{ .Error }}</code></td>
+                <td>{{ .CreatedAt }}</td>
+            <td>
+                {{ if $enableReEnqueu }}
+                    <button onclick="rerun({{ .Signature }})">Rerun</button>
+                {{ end }}
+            </td>
             </tr>
             {{end}}
         </tbody>
     </table>
 
     <script>
-        function rereun(signature) {
+        function rerun(signature) {
             let payload = { signature: signature }
 
             console.info("POST /reenqueue", payload)
@@ -58,6 +78,7 @@
             .then(res => res.json())
             .then(res => {
                 console.log(res)
+                window.location.reload()
             })
             .catch(err => {
                 console.error(err)

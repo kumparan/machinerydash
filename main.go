@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/RichardKnop/machinery/v1"
 	"github.com/RichardKnop/machinery/v1/config"
@@ -56,7 +57,7 @@ func main() {
 
 	e.Static("/static", "public")
 
-	e.GET("/", index)
+	e.GET("/", listAllTasksByState)
 	e.GET("/ping", ping)
 	e.POST("/reenqueue", reEnqueue)
 
@@ -67,8 +68,22 @@ func ping(ec echo.Context) error {
 	return ec.String(http.StatusOK, "pong")
 }
 
-func index(ec echo.Context) error {
-	taskStates, err := machineryDash.FindAllTasksByState(tasks.StateFailure)
+type listTaskData struct {
+	CurrentState   string
+	EnableReEnqueu bool
+	ListStates     []string
+	TaskStates     []*dashboard.TaskWithSignature
+}
+
+var listState = []string{tasks.StateReceived, tasks.StatePending, tasks.StateStarted, tasks.StateRetry, tasks.StateSuccess, tasks.StateFailure}
+
+func listAllTasksByState(ec echo.Context) error {
+	state := ec.QueryParam("state")
+	if strings.TrimSpace(state) == "" {
+		state = tasks.StateStarted
+	}
+
+	taskStates, err := machineryDash.FindAllTasksByState(strings.ToUpper(state))
 	if err != nil {
 		logrus.Error(err)
 		return ec.JSON(http.StatusInternalServerError, map[string]string{
@@ -76,9 +91,13 @@ func index(ec echo.Context) error {
 		})
 	}
 
-	data := struct {
-		TaskStates []*dashboard.TaskWithSignature
-	}{taskStates}
+	state = strings.ToLower(state)
+	data := listTaskData{
+		ListStates:     listState,
+		EnableReEnqueu: state == strings.ToLower(tasks.StateFailure),
+		CurrentState:   state,
+		TaskStates:     taskStates,
+	}
 	return ec.Render(http.StatusOK, "index.html", data)
 }
 

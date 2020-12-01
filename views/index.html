@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Machinery Dash</title>
+
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+
+    <style>
+        pre {
+            overflow-x: auto;
+            white-space: pre-wrap;
+            white-space: -moz-pre-wrap;
+            white-space: -pre-wrap;
+            white-space: -o-pre-wrap;
+            word-wrap: break-word;
+            max-width: 512px;
+        }
+    </style>
+</head>
+<body class="container">
+    <h1>Machinary Dashboard</h1>
+
+    <table class="table">
+        <thead>
+            <th>Task</th>
+            <th>Signature</th>
+            <th>Error</th>
+        </thead>
+        
+        <tbody>
+            {{range .TaskStates}}
+            <tr>
+                <td>{{ .TaskName }}</td>
+                <td><pre class="pre-scrollable">{{ .Signature }}</pre></td>
+                <td>{{ .Error }}</td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+</body>
+</html>

@@ -34,6 +34,8 @@ func init() {
 			GroupMetasTable: "group_metas",
 			Client:          dynamodb.New(sess),
 		},
+		DefaultQueue:    "commerce-service-dlq-worker",
+		ResultsExpireIn: 3600 * 24 * 30, // 30 days
 	})
 	if err != nil {
 		logrus.Fatal(err)
@@ -85,13 +87,27 @@ func reEnqueue(ec echo.Context) error {
 	req := struct {
 		Signature string `json:"signature"`
 	}{}
-	json.Unmarshal([]byte(req.Signature), &sig)
+	err := ec.Bind(&req)
+	if err != nil {
+		logrus.Errorf("failed to parse request: %w", err)
+		return ec.JSON(http.StatusBadRequest, fmtErr("invalid request"))
+	}
 
-	err := machineryDash.ReEnqueueTask(&sig)
+	err = json.Unmarshal([]byte(req.Signature), &sig)
+	if err != nil {
+		logrus.Errorf("failed to unmarshal request: %w", err)
+		return ec.JSON(http.StatusBadRequest, fmtErr("invalid request"))
+	}
+
+	err = machineryDash.ReEnqueueTask(&sig)
 	if err != nil {
 		logrus.Errorf("failed to ReEnqueueTask: %w", err)
-		return ec.JSON(http.StatusInternalServerError, "failed to reenqueue task")
+		return ec.JSON(http.StatusInternalServerError, fmtErr("failed to reenqueue task"))
 	}
 
 	return ec.JSON(http.StatusOK, map[string]string{"message": "ok"})
+}
+
+func fmtErr(msg string) map[string]string {
+	return map[string]string{"error": msg}
 }

@@ -16,7 +16,7 @@ import (
 
 var (
 	// machineryDash dashboardiface.Dashboard
-	listStates = []string{tasks.StatePending, tasks.StateReceived, tasks.StateStarted, tasks.StateRetry, tasks.StateSuccess, tasks.StateFailure}
+	listStates = []string{tasks.StateFailure, tasks.StatePending, tasks.StateReceived, tasks.StateStarted, tasks.StateRetry, tasks.StateSuccess}
 )
 
 // Server :nodoc:
@@ -86,7 +86,7 @@ func (s *Server) handleListAllTasksByState(ec echo.Context) error {
 	state := strings.ToUpper(ec.QueryParam("state"))
 
 	if strings.TrimSpace(state) == "" {
-		state = tasks.StateStarted
+		state = tasks.StateFailure
 	}
 
 	cursor := next

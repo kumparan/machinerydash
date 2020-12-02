@@ -78,12 +78,11 @@ func (s *Server) handlePing(ec echo.Context) error {
 }
 
 func (s *Server) handleListAllTasksByState(ec echo.Context) error {
-	state := ec.QueryParam("state")
+	state := strings.ToUpper(ec.QueryParam("state"))
 	if strings.TrimSpace(state) == "" {
 		state = tasks.StateStarted
 	}
 
-	state = strings.ToUpper(state)
 	taskStates, _, err := s.machineryDash.FindAllTasksByState(state, "", false, 10)
 	if err != nil {
 		logrus.Error(err)

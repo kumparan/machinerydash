@@ -62,6 +62,10 @@
         </tbody>
     </table>
 
+    {{ if .Cursor }}
+        <a href="/?state={{ .CurrentState }}&next={{ .Cursor }}">NEXT >></a>
+    {{ end }}
+
     <script>
         function rerun(signature) {
             let payload = { signature: JSON.stringify(signature) }

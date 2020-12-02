@@ -8,6 +8,7 @@ import (
 	"text/template"
 
 	"github.com/RichardKnop/machinery/v1/tasks"
+	"github.com/kumparan/go-utils"
 	"github.com/kumparan/machinerydash/dashboard"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
@@ -31,6 +32,7 @@ type listTaskData struct {
 	EnableReEnqueu bool
 	ListStates     []string
 	TaskStates     []*dashboard.TaskWithSignature
+	Cursor         string
 }
 
 // New :nodoc:
@@ -78,12 +80,22 @@ func (s *Server) handlePing(ec echo.Context) error {
 }
 
 func (s *Server) handleListAllTasksByState(ec echo.Context) error {
+	next := ec.QueryParam("next")
+	prev := ec.QueryParam("prev")
+	size := utils.StringToInt64(ec.QueryParam("size"))
 	state := strings.ToUpper(ec.QueryParam("state"))
+
 	if strings.TrimSpace(state) == "" {
 		state = tasks.StateStarted
 	}
 
-	taskStates, _, err := s.machineryDash.FindAllTasksByState(state, "", false, 10)
+	cursor := next
+	if prev != "" {
+		cursor = prev
+	}
+
+	size = 2
+	taskStates, cursor, err := s.machineryDash.FindAllTasksByState(state, cursor, true, size)
 	if err != nil {
 		logrus.Error(err)
 		return ec.JSON(http.StatusInternalServerError, map[string]string{
@@ -96,6 +108,7 @@ func (s *Server) handleListAllTasksByState(ec echo.Context) error {
 		EnableReEnqueu: state == tasks.StateFailure,
 		CurrentState:   state,
 		TaskStates:     taskStates,
+		Cursor:         cursor,
 	}
 
 	return ec.Render(http.StatusOK, "index.html", data)

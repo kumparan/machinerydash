@@ -59,6 +59,10 @@ func NewDynamodb(cnf *config.Config, srv machineryServer) Dashboard {
 // FindAllTasksByState :nodoc:
 // cursor is prev & next are base64 encoded LastEvaluatedKey
 func (m *Dynamodb) FindAllTasksByState(state, cursor string, asc bool, size int64) (taskStates []*TaskWithSignature, next string, err error) {
+	if size <= 0 {
+		size = 10
+	}
+
 	queryInput := &dynamodb.QueryInput{
 		TableName:              aws.String(m.cnf.DynamoDB.TaskStatesTable),
 		IndexName:              aws.String(tasks.TaskStateIndex), // use secondary global index
@@ -93,10 +97,12 @@ func (m *Dynamodb) FindAllTasksByState(state, cursor string, asc bool, size int6
 		return nil, next, err
 	}
 
-	next, err = encodeB64LastEvaluatedKey(out.LastEvaluatedKey)
-	if err != nil {
-		log.ERROR.Println(err)
-		return nil, next, err
+	if out.LastEvaluatedKey != nil {
+		next, err = encodeB64LastEvaluatedKey(out.LastEvaluatedKey)
+		if err != nil {
+			log.ERROR.Println(err)
+			return nil, next, err
+		}
 	}
 
 	err = dynamodbattribute.UnmarshalListOfMaps(out.Items, &taskStates)

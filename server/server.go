@@ -15,8 +15,7 @@ import (
 )
 
 var (
-	// machineryDash dashboardiface.Dashboard
-	listStates = []string{tasks.StateFailure, tasks.StatePending, tasks.StateReceived, tasks.StateStarted, tasks.StateRetry, tasks.StateSuccess}
+	stateList = []string{tasks.StateFailure, tasks.StatePending, tasks.StateReceived, tasks.StateStarted, tasks.StateRetry, tasks.StateSuccess}
 )
 
 // Server :nodoc:
@@ -106,7 +105,7 @@ func (s *Server) handleListAllTasksByState(ec echo.Context) error {
 	}
 
 	data := listTaskData{
-		ListStates:     listStates,
+		ListStates:     stateList,
 		EnableReEnqueu: state == tasks.StateFailure,
 		CurrentState:   state,
 		TaskStates:     taskStates,

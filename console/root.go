@@ -29,6 +29,7 @@ func Execute() {
 func init() {
 	RootCmd.PersistentFlags().BoolP("integration", "i", false, "use integration config file")
 	config.GetConf()
+	setupLogger()
 
 }
 

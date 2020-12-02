@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -20,8 +21,8 @@ var (
 
 // Server :nodoc:
 type Server struct {
+	// viewsPath     string
 	port          string
-	viewsPath     string
 	echo          *echo.Echo
 	machineryDash dashboard.Dashboard
 }
@@ -52,7 +53,9 @@ func New(port string, md dashboard.Dashboard) *Server {
 func (s *Server) Start() {
 	ec := s.echo
 
-	s.initRenderer()
+	if err := s.initRenderer(); err != nil {
+		logrus.Fatal(err)
+	}
 
 	ec.GET("/", s.handleListAllTasksByState)
 	ec.GET("/ping", s.handlePing)
@@ -123,21 +126,21 @@ func (s *Server) handleRerun(ec echo.Context) error {
 	req := struct {
 		Signature string `json:"signature"`
 	}{}
-	err := ec.Bind(&req)
+	err := errors.Unwrap(ec.Bind(&req))
 	if err != nil {
-		logrus.Errorf("failed to parse request: %w", err)
+		logrus.Error(err)
 		return ec.JSON(http.StatusBadRequest, fmtErr("invalid request"))
 	}
 
 	err = json.Unmarshal([]byte(req.Signature), &sig)
 	if err != nil {
-		logrus.Errorf("failed to unmarshal request: %w", err)
+		logrus.WithField("signature", req.Signature).Error(err)
 		return ec.JSON(http.StatusBadRequest, fmtErr("invalid request"))
 	}
 
 	err = s.machineryDash.RerunTask(&sig)
 	if err != nil {
-		logrus.Errorf("failed to Rerun: %w", err)
+		logrus.WithField("signatyre", req.Signature).Error(err)
 		return ec.JSON(http.StatusInternalServerError, fmtErr("failed to rerun task"))
 	}
 

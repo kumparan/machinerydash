@@ -27,12 +27,17 @@ type Server struct {
 	machineryDash dashboard.Dashboard
 }
 
+type cursorInfo struct {
+	Cursor string
+	Size   int64
+}
+
 type listTaskData struct {
 	CurrentState   string
 	EnableReEnqueu bool
 	ListStates     []string
 	TaskStates     []*dashboard.TaskWithSignature
-	Cursor         string
+	cursorInfo
 }
 
 // New :nodoc:
@@ -107,7 +112,10 @@ func (s *Server) handleListAllTasksByState(ec echo.Context) error {
 		EnableReEnqueu: state == tasks.StateFailure,
 		CurrentState:   state,
 		TaskStates:     taskStates,
-		Cursor:         cursor,
+		cursorInfo: cursorInfo{
+			Cursor: cursor,
+			Size:   size,
+		},
 	}
 
 	return ec.Render(http.StatusOK, "index.html", data)

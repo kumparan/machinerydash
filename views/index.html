@@ -63,7 +63,7 @@
     </table>
 
     {{ if .Cursor }}
-        <a href="/?state={{ .CurrentState }}&next={{ .Cursor }}">NEXT >></a>
+        <a href="/?state={{ .CurrentState }}&next={{ .Cursor }}&size={{ .Size }}">NEXT >></a>
     {{ end }}
 
     <script>

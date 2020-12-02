@@ -57,7 +57,7 @@ func createMachineryCfg() *machineryConfig.Config {
 			GroupMetasTable: config.DynamodbGroupTable(),
 			Client:          dynamodb.New(createDynamoDBSession()),
 		},
-		DefaultQueue:    config.MachineryBrokerNamespace(), // use namespace as queueu
+		DefaultQueue:    config.MachineryBrokerNamespace(), // use namespace as queue
 		ResultsExpireIn: config.MachineryResultExpiry(),
 	}
 }

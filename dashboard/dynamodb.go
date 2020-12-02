@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/RichardKnop/machinery/v1/backends/result"
 	"github.com/RichardKnop/machinery/v1/config"
 	"github.com/RichardKnop/machinery/v1/log"
 	"github.com/RichardKnop/machinery/v1/tasks"
@@ -13,17 +12,12 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
-	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbiface"
 )
-
-type machineryServer interface {
-	SendTask(signature *tasks.Signature) (*result.AsyncResult, error)
-}
 
 // Dynamodb monitor tasks
 type Dynamodb struct {
 	cnf    *config.Config
-	client dynamodbiface.DynamoDBAPI
+	client dynamoDBClient
 	server machineryServer
 }
 
@@ -57,7 +51,7 @@ func NewDynamodb(cnf *config.Config, srv machineryServer) Dashboard {
 }
 
 // FindAllTasksByState :nodoc:
-// cursor is prev & next are base64 encoded LastEvaluatedKey
+// cursor e.g. "prev" & "next" are base64 encoded LastEvaluatedKey
 func (m *Dynamodb) FindAllTasksByState(state, cursor string, asc bool, size int64) (taskStates []*TaskWithSignature, next string, err error) {
 	if size <= 0 {
 		size = 10
@@ -97,6 +91,10 @@ func (m *Dynamodb) FindAllTasksByState(state, cursor string, asc bool, size int6
 		return nil, next, err
 	}
 
+	if out == nil {
+		return nil, "", nil
+	}
+
 	if out.LastEvaluatedKey != nil {
 		next, err = encodeB64LastEvaluatedKey(out.LastEvaluatedKey)
 		if err != nil {
@@ -129,7 +127,7 @@ func (m *Dynamodb) RerunTask(sig *tasks.Signature) error {
 func decodeB64LastEvaluatedKey(cursor string) (key map[string]*dynamodb.AttributeValue, err error) {
 	decoded, err := base64.StdEncoding.DecodeString(cursor)
 	if err != nil {
-		return nil, fmt.Errorf("faild to decode cursor: %w", err)
+		return nil, fmt.Errorf("failed to decode cursor: %w", err)
 	}
 
 	err = json.Unmarshal(decoded, &key)

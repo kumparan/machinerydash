@@ -16,4 +16,4 @@ require (
 	github.com/spf13/viper v1.7.1
 )
 
-replace github.com/RichardKnop/machinery => github.com/kumparan/machinery v1.9.3-0.20201201101758-fb57bbaa5797
+replace github.com/RichardKnop/machinery => github.com/kumparan/machinery v1.9.3-0.20201202083018-181992f5f0eb

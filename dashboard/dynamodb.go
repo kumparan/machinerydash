@@ -14,8 +14,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 )
 
-// Dynamodb monitor tasks
-type Dynamodb struct {
+// DynamoDB monitor tasks
+type DynamoDB struct {
 	cnf    *config.Config
 	client dynamoDBClient
 	server machineryServer
@@ -33,7 +33,7 @@ type TaskWithSignature struct {
 
 // NewDynamodb :nodoc:
 func NewDynamodb(cnf *config.Config, srv machineryServer) Dashboard {
-	dash := &Dynamodb{
+	dash := &DynamoDB{
 		cnf:    cnf,
 		server: srv,
 	}
@@ -52,7 +52,7 @@ func NewDynamodb(cnf *config.Config, srv machineryServer) Dashboard {
 
 // FindAllTasksByState :nodoc:
 // cursor e.g. "prev" & "next" are base64 encoded LastEvaluatedKey
-func (m *Dynamodb) FindAllTasksByState(state, cursor string, asc bool, size int64) (taskStates []*TaskWithSignature, next string, err error) {
+func (m *DynamoDB) FindAllTasksByState(state, cursor string, asc bool, size int64) (taskStates []*TaskWithSignature, next string, err error) {
 	if size <= 0 {
 		size = 10
 	}
@@ -113,7 +113,7 @@ func (m *Dynamodb) FindAllTasksByState(state, cursor string, asc bool, size int6
 }
 
 // RerunTask :nodo:
-func (m *Dynamodb) RerunTask(sig *tasks.Signature) error {
+func (m *DynamoDB) RerunTask(sig *tasks.Signature) error {
 	sig.ETA = nil // reset ETA
 	_, err := m.server.SendTask(sig)
 	if err != nil {

@@ -16,7 +16,7 @@ func Test_FindAllTasksByState(t *testing.T) {
 	t.Run("not found", func(t *testing.T) {
 		dynamodbClient := &dynamodbClientMock{}
 		machineryServer := &machineryServerMock{}
-		dyn := &Dynamodb{
+		dyn := &DynamoDB{
 			cnf: &config.Config{
 				DynamoDB: &config.DynamoDBConfig{},
 			},
@@ -37,7 +37,7 @@ func Test_FindAllTasksByState(t *testing.T) {
 	t.Run("ok", func(t *testing.T) {
 		dynamodbClient := &dynamodbClientMock{}
 		machineryServer := &machineryServerMock{}
-		dyn := &Dynamodb{
+		dyn := &DynamoDB{
 			cnf: &config.Config{
 				DynamoDB: &config.DynamoDBConfig{},
 			},

@@ -9,5 +9,4 @@ require (
 	github.com/sirupsen/logrus v1.4.2
 )
 
-// replace github.com/RichardKnop/machinery => github.com/kumparan/machinery v1.9.3-0.20201201101758-fb57bbaa5797
-replace github.com/RichardKnop/machinery => /Users/miun/work/yowez/lab/machinery
+replace github.com/RichardKnop/machinery => github.com/kumparan/machinery v1.9.3-0.20201201101758-fb57bbaa5797

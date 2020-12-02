@@ -68,6 +68,10 @@
 
     <script>
         function rerun(signature) {
+            if (!confirm("Do you want to Rerun the task ?")) {
+                return
+            }
+
             let payload = { signature: JSON.stringify(signature) }
 
             fetch("/reenqueue", {

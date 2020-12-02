@@ -1,21 +1,13 @@
 package main
 
 import (
-	"encoding/json"
-	"html/template"
-	"io"
-	"net/http"
-	"strings"
-
 	"github.com/RichardKnop/machinery/v1"
 	"github.com/RichardKnop/machinery/v1/config"
-	dashboard "github.com/RichardKnop/machinery/v1/dashboard/dynamodb"
 	dashboardiface "github.com/RichardKnop/machinery/v1/dashboard/iface"
-	"github.com/RichardKnop/machinery/v1/tasks"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"github.com/labstack/echo/v4"
+	"github.com/kumparan/machinerydash/server"
 	"github.com/sirupsen/logrus"
 )
 
@@ -43,90 +35,7 @@ func init() {
 	}
 }
 
-type htmlTemplate struct {
-	templates *template.Template
-}
-
-func (t *htmlTemplate) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	return t.templates.ExecuteTemplate(w, name, data)
-}
-
 func main() {
-	e := echo.New()
-	e.Renderer = &htmlTemplate{template.Must(template.ParseGlob("views/*.html"))}
-
-	e.Static("/static", "public")
-
-	e.GET("/", listAllTasksByState)
-	e.GET("/ping", ping)
-	e.POST("/reenqueue", reEnqueue)
-
-	e.Logger.Fatal(e.Start(":9000"))
-}
-
-func ping(ec echo.Context) error {
-	return ec.String(http.StatusOK, "pong")
-}
-
-type listTaskData struct {
-	CurrentState   string
-	EnableReEnqueu bool
-	ListStates     []string
-	TaskStates     []*dashboard.TaskWithSignature
-}
-
-var listState = []string{tasks.StateReceived, tasks.StatePending, tasks.StateStarted, tasks.StateRetry, tasks.StateSuccess, tasks.StateFailure}
-
-func listAllTasksByState(ec echo.Context) error {
-	state := ec.QueryParam("state")
-	if strings.TrimSpace(state) == "" {
-		state = tasks.StateStarted
-	}
-
-	taskStates, err := machineryDash.FindAllTasksByState(strings.ToUpper(state))
-	if err != nil {
-		logrus.Error(err)
-		return ec.JSON(http.StatusInternalServerError, map[string]string{
-			"error": "something wrong",
-		})
-	}
-
-	state = strings.ToLower(state)
-	data := listTaskData{
-		ListStates:     listState,
-		EnableReEnqueu: state == strings.ToLower(tasks.StateFailure),
-		CurrentState:   state,
-		TaskStates:     taskStates,
-	}
-	return ec.Render(http.StatusOK, "index.html", data)
-}
-
-func reEnqueue(ec echo.Context) error {
-	sig := tasks.Signature{}
-	req := struct {
-		Signature string `json:"signature"`
-	}{}
-	err := ec.Bind(&req)
-	if err != nil {
-		logrus.Errorf("failed to parse request: %w", err)
-		return ec.JSON(http.StatusBadRequest, fmtErr("invalid request"))
-	}
-
-	err = json.Unmarshal([]byte(req.Signature), &sig)
-	if err != nil {
-		logrus.Errorf("failed to unmarshal request: %w", err)
-		return ec.JSON(http.StatusBadRequest, fmtErr("invalid request"))
-	}
-
-	err = machineryDash.ReEnqueueTask(&sig)
-	if err != nil {
-		logrus.Errorf("failed to ReEnqueueTask: %w", err)
-		return ec.JSON(http.StatusInternalServerError, fmtErr("failed to reenqueue task"))
-	}
-
-	return ec.JSON(http.StatusOK, map[string]string{"message": "ok"})
-}
-
-func fmtErr(msg string) map[string]string {
-	return map[string]string{"error": msg}
+	srv := server.New("9000", machineryDash)
+	srv.Start()
 }

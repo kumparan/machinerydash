@@ -1,3 +1,4 @@
+env: "development"
 port: 9000
 dynamodb:
   host: "http://localhost:8000"

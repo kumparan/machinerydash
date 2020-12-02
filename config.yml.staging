@@ -1,0 +1,13 @@
+env: "staging"
+log_level: "debug"
+port: 9000
+dynamodb:
+  host: "$staging_dynamodb_host"
+  region: "$staging_dynamodb_region"
+  is_local: "$staging_dynamodb_is_local"
+  task_table: "$staging_dynamodb_task_table"
+  group_table: "$staging_dynamodb_group_table"
+machinery:
+  broker_namespace: "$staging_machinery_broker_namespace"
+  broker_host: "$staging_machinery_broker_host"
+  result_expiry: $staging_machinery_result_expiry # seconds

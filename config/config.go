@@ -35,6 +35,16 @@ func Env() string {
 	return viper.GetString("env")
 }
 
+// LogLevel :nodoc:
+func LogLevel() string {
+	return viper.GetString("log_level")
+}
+
+// SentryDSN :nodoc:
+func SentryDSN() string {
+	return viper.GetString("sentry_dsn")
+}
+
 // Port :nodoc:
 func Port() string {
 	return viper.GetString("port")

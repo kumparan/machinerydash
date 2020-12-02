@@ -55,8 +55,6 @@ func (s *Server) Start() {
 
 	s.initRenderer()
 
-	ec.Static("/static", "public")
-
 	ec.GET("/", s.handleListAllTasksByState)
 	ec.GET("/ping", s.handlePing)
 	ec.POST("/reenqueue", s.handleReEnqueue)

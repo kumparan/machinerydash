@@ -2,10 +2,11 @@ package main
 
 import (
 	"github.com/RichardKnop/machinery/v1"
-	"github.com/RichardKnop/machinery/v1/config"
+	machineryConfig "github.com/RichardKnop/machinery/v1/config"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/kumparan/machinerydash/config"
 	"github.com/kumparan/machinerydash/dashboard"
 	"github.com/kumparan/machinerydash/server"
 	"github.com/sirupsen/logrus"
@@ -13,27 +14,8 @@ import (
 
 var machineryDash dashboard.Dashboard
 
-func init() {
-
-}
-
 func main() {
-	sess := session.Must(session.NewSession(&aws.Config{
-		Region:   aws.String("asia"),
-		Endpoint: aws.String("http://localhost:8000"),
-	}))
-
-	cfg := &config.Config{
-		Broker:        "redis://localhost:6379/3",
-		ResultBackend: "http://localhost:8000",
-		DynamoDB: &config.DynamoDBConfig{
-			TaskStatesTable: "task_states",
-			GroupMetasTable: "group_metas",
-			Client:          dynamodb.New(sess),
-		},
-		DefaultQueue:    "commerce-service-dlq-worker",
-		ResultsExpireIn: 3600 * 24 * 30, // 30 days
-	}
+	cfg := createMachineryCfg()
 
 	machineryServer, err := machinery.NewServer(cfg)
 	if err != nil {
@@ -41,6 +23,31 @@ func main() {
 	}
 
 	machineryDash = dashboard.NewDynamodb(cfg, machineryServer)
-	srv := server.New("9000", machineryDash)
+	srv := server.New(config.Port(), machineryDash)
 	srv.Start()
+}
+
+func createDynamoDBSession() *session.Session {
+	if config.IsLocalDynamodb() {
+		return session.Must(session.NewSession(&aws.Config{
+			Region:   aws.String(config.DynamodbRegion()),
+			Endpoint: aws.String(config.DynamodbHost()),
+		}))
+	}
+
+	return nil // TODO: handle for non local db
+}
+
+func createMachineryCfg() *machineryConfig.Config {
+	return &machineryConfig.Config{
+		Broker:        config.MachineryBrokerHost(),
+		ResultBackend: config.DynamodbHost(),
+		DynamoDB: &machineryConfig.DynamoDBConfig{
+			TaskStatesTable: config.DynamodbTaskTable(),
+			GroupMetasTable: config.DynamodbGroupTable(),
+			Client:          dynamodb.New(createDynamoDBSession()),
+		},
+		DefaultQueue:    config.MachineryBrokerNamespace(), // use namespace as queueu
+		ResultsExpireIn: config.MachineryResultExpiry(),
+	}
 }

@@ -54,7 +54,7 @@
                 <td>{{ .CreatedAt }}</td>
             <td>
                 {{ if $enableReEnqueu }}
-                    <button onclick="rerun({{ .Signature }})">Rerun</button>
+                    <button onclick='rerun({{ .Signature }})'>Rerun</button>
                 {{ end }}
             </td>
             </tr>
@@ -64,9 +64,7 @@
 
     <script>
         function rerun(signature) {
-            let payload = { signature: signature }
-
-            console.info("POST /reenqueue", payload)
+            let payload = { signature: JSON.stringify(signature) }
 
             fetch("/reenqueue", {
                 method: "POST",

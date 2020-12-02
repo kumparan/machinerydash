@@ -7,9 +7,8 @@ import (
 	"strings"
 	"text/template"
 
-	dashboard "github.com/RichardKnop/machinery/v1/dashboard/dynamodb"
-	dashboardiface "github.com/RichardKnop/machinery/v1/dashboard/iface"
 	"github.com/RichardKnop/machinery/v1/tasks"
+	"github.com/kumparan/machinerydash/dashboard"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 )
@@ -24,7 +23,7 @@ type Server struct {
 	port          string
 	viewsPath     string
 	echo          *echo.Echo
-	machineryDash dashboardiface.Dashboard
+	machineryDash dashboard.Dashboard
 }
 
 type listTaskData struct {
@@ -35,7 +34,7 @@ type listTaskData struct {
 }
 
 // New :nodoc:
-func New(port string, md dashboardiface.Dashboard) *Server {
+func New(port string, md dashboard.Dashboard) *Server {
 	return &Server{
 		port:          port,
 		echo:          echo.New(),
@@ -85,7 +84,7 @@ func (s *Server) handleListAllTasksByState(ec echo.Context) error {
 	}
 
 	state = strings.ToUpper(state)
-	taskStates, err := s.machineryDash.FindAllTasksByState(state)
+	taskStates, _, err := s.machineryDash.FindAllTasksByState(state, "", false, 10)
 	if err != nil {
 		logrus.Error(err)
 		return ec.JSON(http.StatusInternalServerError, map[string]string{

@@ -3,23 +3,27 @@ package main
 import (
 	"github.com/RichardKnop/machinery/v1"
 	"github.com/RichardKnop/machinery/v1/config"
-	dashboardiface "github.com/RichardKnop/machinery/v1/dashboard/iface"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/kumparan/machinerydash/dashboard"
 	"github.com/kumparan/machinerydash/server"
 	"github.com/sirupsen/logrus"
 )
 
-var machineryDash dashboardiface.Dashboard
+var machineryDash dashboard.Dashboard
 
 func init() {
-	var err error
+
+}
+
+func main() {
 	sess := session.Must(session.NewSession(&aws.Config{
 		Region:   aws.String("asia"),
 		Endpoint: aws.String("http://localhost:8000"),
 	}))
-	machineryDash, err = machinery.NewDashboard(&config.Config{
+
+	cfg := &config.Config{
 		Broker:        "redis://localhost:6379/3",
 		ResultBackend: "http://localhost:8000",
 		DynamoDB: &config.DynamoDBConfig{
@@ -29,13 +33,14 @@ func init() {
 		},
 		DefaultQueue:    "commerce-service-dlq-worker",
 		ResultsExpireIn: 3600 * 24 * 30, // 30 days
-	})
+	}
+
+	machineryServer, err := machinery.NewServer(cfg)
 	if err != nil {
 		logrus.Fatal(err)
 	}
-}
 
-func main() {
+	machineryDash = dashboard.NewDynamodb(cfg, machineryServer)
 	srv := server.New("9000", machineryDash)
 	srv.Start()
 }

@@ -94,7 +94,6 @@ func (s *Server) handleListAllTasksByState(ec echo.Context) error {
 		cursor = prev
 	}
 
-	size = 2
 	taskStates, cursor, err := s.machineryDash.FindAllTasksByState(state, cursor, true, size)
 	if err != nil {
 		logrus.Error(err)

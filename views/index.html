@@ -44,7 +44,7 @@
         </thead>
         
         <tbody>
-            {{ $enableReEnqueu := .EnableReEnqueu }}
+            {{ $enableRerun := .EnableRerun }}
             {{range .TaskStates}}
             <tr>
                 <td style="padding:4px; max-width: 100px"><code>{{ .TaskUUID }}</code></td>
@@ -53,7 +53,7 @@
                 <td><code>{{ .Error }}</code></td>
                 <td>{{ .CreatedAt }}</td>
             <td>
-                {{ if $enableReEnqueu }}
+                {{ if $enableRerun }}
                     <button type="button" class="btn btn-primary" onclick='rerun({{ .Signature }})'>Rerun</button>
                 {{ end }}
             </td>
@@ -74,7 +74,7 @@
 
             let payload = { signature: JSON.stringify(signature) }
 
-            fetch("/reenqueue", {
+            fetch("/rerun", {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json'

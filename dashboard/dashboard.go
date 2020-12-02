@@ -7,5 +7,5 @@ import (
 // Dashboard :noodc:
 type Dashboard interface {
 	FindAllTasksByState(state, cursor string, asc bool, size int64) (taskStates []*TaskWithSignature, next string, err error)
-	ReEnqueueTask(sig *tasks.Signature) error
+	RerunTask(sig *tasks.Signature) error
 }

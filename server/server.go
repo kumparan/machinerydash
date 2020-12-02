@@ -32,10 +32,10 @@ type cursorInfo struct {
 }
 
 type listTaskData struct {
-	CurrentState   string
-	EnableReEnqueu bool
-	ListStates     []string
-	TaskStates     []*dashboard.TaskWithSignature
+	CurrentState string
+	EnableRerun  bool
+	ListStates   []string
+	TaskStates   []*dashboard.TaskWithSignature
 	cursorInfo
 }
 
@@ -56,7 +56,7 @@ func (s *Server) Start() {
 
 	ec.GET("/", s.handleListAllTasksByState)
 	ec.GET("/ping", s.handlePing)
-	ec.POST("/reenqueue", s.handleReEnqueue)
+	ec.POST("/rerun", s.handleRerun)
 
 	ec.Logger.Fatal(ec.Start(":" + s.port))
 }
@@ -105,10 +105,10 @@ func (s *Server) handleListAllTasksByState(ec echo.Context) error {
 	}
 
 	data := listTaskData{
-		ListStates:     stateList,
-		EnableReEnqueu: state == tasks.StateFailure,
-		CurrentState:   state,
-		TaskStates:     taskStates,
+		ListStates:   stateList,
+		EnableRerun:  state == tasks.StateFailure,
+		CurrentState: state,
+		TaskStates:   taskStates,
 		cursorInfo: cursorInfo{
 			Cursor: cursor,
 			Size:   size,
@@ -118,7 +118,7 @@ func (s *Server) handleListAllTasksByState(ec echo.Context) error {
 	return ec.Render(http.StatusOK, "index.html", data)
 }
 
-func (s *Server) handleReEnqueue(ec echo.Context) error {
+func (s *Server) handleRerun(ec echo.Context) error {
 	sig := tasks.Signature{}
 	req := struct {
 		Signature string `json:"signature"`
@@ -135,10 +135,10 @@ func (s *Server) handleReEnqueue(ec echo.Context) error {
 		return ec.JSON(http.StatusBadRequest, fmtErr("invalid request"))
 	}
 
-	err = s.machineryDash.ReEnqueueTask(&sig)
+	err = s.machineryDash.RerunTask(&sig)
 	if err != nil {
-		logrus.Errorf("failed to ReEnqueueTask: %w", err)
-		return ec.JSON(http.StatusInternalServerError, fmtErr("failed to reenqueue task"))
+		logrus.Errorf("failed to Rerun: %w", err)
+		return ec.JSON(http.StatusInternalServerError, fmtErr("failed to rerun task"))
 	}
 
 	return ec.JSON(http.StatusOK, map[string]string{"message": "ok"})

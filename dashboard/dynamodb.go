@@ -114,10 +114,9 @@ func (m *Dynamodb) FindAllTasksByState(state, cursor string, asc bool, size int6
 	return
 }
 
-// ReEnqueueTask :FIXME: failed to enqueue because the args value not matching the type
-func (m *Dynamodb) ReEnqueueTask(sig *tasks.Signature) error {
-	sig.ETA = nil
-
+// RerunTask :nodo:
+func (m *Dynamodb) RerunTask(sig *tasks.Signature) error {
+	sig.ETA = nil // reset ETA
 	_, err := m.server.SendTask(sig)
 	if err != nil {
 		err = fmt.Errorf("failed to send task: %w", err)

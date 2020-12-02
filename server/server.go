@@ -59,8 +59,6 @@ func (s *Server) Start() {
 }
 
 func (s *Server) initRenderer() error {
-	s.echo.Renderer = &htmlTemplate{template.Must(template.ParseGlob("views/*.html"))}
-
 	bt, err := ioutil.ReadFile("views/index.html")
 	if err != nil {
 		return err

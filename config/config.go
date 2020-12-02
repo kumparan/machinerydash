@@ -7,6 +7,10 @@ import (
 	"github.com/spf13/viper"
 )
 
+func init() {
+	GetConf()
+}
+
 // GetConf :nodoc:
 func GetConf() {
 	viper.AddConfigPath(".")
@@ -23,26 +27,6 @@ func GetConf() {
 	err := viper.ReadInConfig()
 	if err != nil {
 		logrus.Warningf("%v", err)
-	}
-}
-
-// GetIntegrationConf :nodoc:
-func GetIntegrationConf() {
-	viper.AddConfigPath("./qa/")
-	viper.AddConfigPath(".")
-	viper.AddConfigPath("./..")
-	viper.AddConfigPath("./../..")
-	viper.AddConfigPath("./../../..")
-	viper.SetConfigName("integration-config")
-	viper.SetEnvPrefix("svc")
-
-	replacer := strings.NewReplacer(".", "_")
-	viper.SetEnvKeyReplacer(replacer)
-
-	viper.AutomaticEnv()
-	err := viper.ReadInConfig()
-	if err != nil && Env() != "test" {
-		logrus.Warnf("%v", err)
 	}
 }
 

@@ -30,4 +30,5 @@ endif
 
 build:
 	@pkger
-	@go build -o bin/machinerydash .
+	@go build -ldflags="-w -s" -o bin/machinerydash .
+	@echo ">>> bin/machinerydash"

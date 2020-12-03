@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path"
 	"strings"
 	"text/template"
 
@@ -62,6 +63,7 @@ func (s *Server) Start() {
 
 	ec.GET("/", s.handleListAllTasksByState)
 	ec.GET("/ping", s.handlePing)
+	ec.GET("/static/*", s.handleStatic)
 	ec.POST("/rerun", s.handleRerun)
 
 	ec.Logger.Fatal(ec.Start(":" + s.port))
@@ -101,6 +103,25 @@ func (s *Server) initRenderer() error {
 
 func (s *Server) handlePing(ec echo.Context) error {
 	return ec.String(http.StatusOK, "pong")
+}
+
+func (s *Server) handleStatic(c echo.Context) error {
+	f, err := pkger.Open(path.Join("/public", c.Param("*")))
+	if err != nil {
+		if !errors.Is(err, os.ErrNotExist) {
+			logrus.Error(err)
+		}
+		return c.NoContent(http.StatusNotFound)
+	}
+
+	bt, err := ioutil.ReadAll(f)
+	if err != nil {
+		logrus.Error(err)
+		return c.String(http.StatusInternalServerError, "something wrong")
+	}
+
+	c.Response().Header().Set(echo.HeaderContentType, "text/css")
+	return c.String(http.StatusOK, string(bt))
 }
 
 func (s *Server) handleListAllTasksByState(ec echo.Context) error {

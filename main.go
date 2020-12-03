@@ -8,5 +8,6 @@ import (
 func main() {
 	// include all files to be bundled at build times
 	pkger.Include("/views")
+	pkger.Include("/public")
 	console.Execute()
 }

@@ -27,3 +27,7 @@ ifdef version
 	$(eval changelog_args=--next-tag $(version) $(changelog_args))
 endif
 	git-chglog $(changelog_args)
+
+build:
+	@pkger
+	@go build -o bin/machinerydash .

@@ -3,8 +3,10 @@ package server
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 	"text/template"
 
@@ -12,6 +14,7 @@ import (
 	"github.com/kumparan/go-utils"
 	"github.com/kumparan/machinerydash/dashboard"
 	"github.com/labstack/echo/v4"
+	"github.com/markbates/pkger"
 	"github.com/sirupsen/logrus"
 )
 
@@ -65,18 +68,34 @@ func (s *Server) Start() {
 }
 
 func (s *Server) initRenderer() error {
-	bt, err := ioutil.ReadFile("views/index.html")
+	serverTemplate := template.New("")
+	err := pkger.Walk("/views", func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			return nil
+		}
+
+		f, err := pkger.Open(path)
+		if err != nil {
+			return fmt.Errorf("failed to open %s from pkger: %w", path, err)
+		}
+
+		bt, err := ioutil.ReadAll(f)
+		if err != nil {
+			return fmt.Errorf("failed to read file: %w", err)
+		}
+
+		_, err = serverTemplate.New(info.Name()).Parse(string(bt))
+		if err != nil {
+			return fmt.Errorf("unable to parse template from %s: %w", path, err)
+		}
+
+		return nil
+	})
 	if err != nil {
 		return err
 	}
 
-	tpl := template.New("index.html")
-	_, err = tpl.Parse(string(bt))
-	if err != nil {
-		return err
-	}
-
-	s.echo.Renderer = &htmlTemplate{templates: tpl}
+	s.echo.Renderer = &htmlTemplate{templates: serverTemplate}
 	return nil
 }
 

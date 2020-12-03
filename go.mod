@@ -12,6 +12,7 @@ require (
 	github.com/getsentry/raven-go v0.2.0 // indirect
 	github.com/kumparan/go-utils v1.7.0
 	github.com/labstack/echo/v4 v4.1.17
+	github.com/markbates/pkger v0.17.1
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/viper v1.7.1

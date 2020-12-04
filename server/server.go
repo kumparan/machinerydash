@@ -72,6 +72,10 @@ func (s *Server) Start() {
 func (s *Server) initRenderer() error {
 	serverTemplate := template.New("")
 	err := pkger.Walk("/views", func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
 		if info.IsDir() {
 			return nil
 		}

@@ -55,23 +55,23 @@ func DynamodbHost() string {
 	return viper.GetString("dynamodb.host")
 }
 
-// DynamodbRegion :nodoc:
-func DynamodbRegion() string {
+// DynamoDBRegion :nodoc:
+func DynamoDBRegion() string {
 	return viper.GetString("dynamodb.region")
 }
 
-// DynamodbTaskTable :nodoc:
-func DynamodbTaskTable() string {
+// DynamoDBTaskTable :nodoc:
+func DynamoDBTaskTable() string {
 	return viper.GetString("dynamodb.task_table")
 }
 
-// DynamodbGroupTable :nodoc:
-func DynamodbGroupTable() string {
+// DynamoDBGroupTable :nodoc:
+func DynamoDBGroupTable() string {
 	return viper.GetString("dynamodb.group_table")
 }
 
-// IsLocalDynamodb :nodoc:
-func IsLocalDynamodb() bool {
+// IsLocalDynamoDB :nodoc:
+func IsLocalDynamoDB() bool {
 	return viper.GetBool("dynamodb.is_local")
 }
 

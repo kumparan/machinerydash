@@ -4,9 +4,11 @@ port: 9000
 dynamodb:
   host: "$prod_dynamodb_host"
   region: "$prod_dynamodb_region"
-  is_local: "$prod_dynamodb_is_local"
   task_table: "$prod_dynamodb_task_table"
   group_table: "$prod_dynamodb_group_table"
+  aws_region: "$prod_dynamodb_region"
+  aws_access_key: "$prod_dynamodb_aws_access_key"
+  aws_secret_access: "$prod_dynamodb_aws_secret_access"
 machinery:
   broker_namespace: "$prod_machinery_broker_namespace"
   broker_host: "$prod_machinery_broker_host"

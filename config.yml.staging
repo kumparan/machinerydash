@@ -4,9 +4,11 @@ port: 9000
 dynamodb:
   host: "$staging_dynamodb_host"
   region: "$staging_dynamodb_region"
-  is_local: "$staging_dynamodb_is_local"
   task_table: "$staging_dynamodb_task_table"
   group_table: "$staging_dynamodb_group_table"
+  aws_region: "$staging_dynamodb_region"
+  aws_access_key: "$staging_dynamodb_aws_access_key"
+  aws_secret_access: "$staging_dynamodb_aws_secret_access"
 machinery:
   broker_namespace: "$staging_machinery_broker_namespace"
   broker_host: "$staging_machinery_broker_host"

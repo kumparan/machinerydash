@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/sirupsen/logrus"
@@ -13,16 +14,16 @@ import (
 )
 
 // NewDynamoDBClient create new dynamodb client to local instance or AWS instance
-// TODO: nedd to handle for connecting to AWS instance
 func NewDynamoDBClient() *dynamodb.DynamoDB {
 	var sess *session.Session
-	if config.IsLocalDynamoDB() {
-		sess = session.Must(session.NewSession(&aws.Config{
-			Region:   aws.String(config.DynamoDBRegion()),
-			Endpoint: aws.String(config.DynamodbHost()),
-		}))
+	cfg := &aws.Config{
+		Region:   aws.String(config.DynamoDBAWSRegion()),
+		Endpoint: aws.String(config.DynamoDBHost()),
+		Credentials: credentials.NewStaticCredentials(config.DynamoDBAWSAccessKey(),
+			config.DynamoDBAWSSecretAccess(), ""),
 	}
 
+	sess = session.Must(session.NewSession(cfg))
 	return dynamodb.New(sess)
 }
 

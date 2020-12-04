@@ -50,14 +50,9 @@ func Port() string {
 	return viper.GetString("port")
 }
 
-// DynamodbHost :nodoc:
-func DynamodbHost() string {
+// DynamoDBHost :nodoc:
+func DynamoDBHost() string {
 	return viper.GetString("dynamodb.host")
-}
-
-// DynamoDBRegion :nodoc:
-func DynamoDBRegion() string {
-	return viper.GetString("dynamodb.region")
 }
 
 // DynamoDBTaskTable :nodoc:
@@ -68,11 +63,6 @@ func DynamoDBTaskTable() string {
 // DynamoDBGroupTable :nodoc:
 func DynamoDBGroupTable() string {
 	return viper.GetString("dynamodb.group_table")
-}
-
-// IsLocalDynamoDB :nodoc:
-func IsLocalDynamoDB() bool {
-	return viper.GetBool("dynamodb.is_local")
 }
 
 // MachineryResultExpiry :nodoc:
@@ -88,4 +78,19 @@ func MachineryBrokerNamespace() string {
 // MachineryBrokerHost :nodoc:
 func MachineryBrokerHost() string {
 	return viper.GetString("machinery.broker_host")
+}
+
+// DynamoDBAWSRegion :nodoc:
+func DynamoDBAWSRegion() string {
+	return viper.GetString("dynamodb.aws_region")
+}
+
+// DynamoDBAWSAccessKey :nodoc:
+func DynamoDBAWSAccessKey() string {
+	return viper.GetString("dynamodb.aws_access_key")
+}
+
+// DynamoDBAWSSecretAccess :nodoc:
+func DynamoDBAWSSecretAccess() string {
+	return viper.GetString("dynamodb.aws_secret_access")
 }

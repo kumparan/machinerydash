@@ -112,13 +112,54 @@ func (m *DynamoDB) FindAllTasksByState(state, cursor string, asc bool, size int6
 	return
 }
 
+// FindTaskByUUID :nodoc:
+func (m *DynamoDB) FindTaskByUUID(uuid string) (*TaskWithSignature, error) {
+	res, err := m.client.GetItem(&dynamodb.GetItemInput{
+		TableName:            aws.String(m.cnf.DynamoDB.TaskStatesTable),
+		ProjectionExpression: aws.String("TaskUUID, #st, TaskName, #err, Signature, CreatedAt"),
+		ExpressionAttributeNames: map[string]*string{
+			"#st":  aws.String("State"),
+			"#err": aws.String("Error"),
+		},
+		Key: map[string]*dynamodb.AttributeValue{
+			":st": {
+				S: aws.String(uuid),
+			},
+		},
+	})
+	if err != nil {
+		err = fmt.Errorf("failed to get item %s: %w", uuid, err)
+		return nil, err
+	}
+
+	task := &TaskWithSignature{}
+	err = dynamodbattribute.UnmarshalMap(res.Item, task)
+	if err != nil {
+		err = fmt.Errorf("failed to unmarshal: %w", err)
+		return nil, err
+	}
+
+	return task, nil
+}
+
 // RerunTask :nodo:
-func (m *DynamoDB) RerunTask(sig *tasks.Signature) error {
+func (m *DynamoDB) RerunTask(uuid string) error {
+	task, err := m.FindTaskByUUID(uuid)
+	if err != nil {
+		return err
+	}
+
+	sig := &tasks.Signature{}
+	err = json.Unmarshal([]byte(task.Signature), &sig)
+	if err != nil {
+		err = fmt.Errorf("failed to unmarshal: %w", err)
+		return err
+	}
+
 	sig.ETA = nil // reset ETA
-	_, err := m.server.SendTask(sig)
+	_, err = m.server.SendTask(sig)
 	if err != nil {
 		err = fmt.Errorf("failed to send task: %w", err)
-		log.ERROR.Print(err)
 		return err
 	}
 	return err

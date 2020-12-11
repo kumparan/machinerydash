@@ -12,6 +12,10 @@ func (d *dynamodbClientMock) Query(*dynamodb.QueryInput) (*dynamodb.QueryOutput,
 	return nil, nil
 }
 
+func (d *dynamodbClientMock) GetItem(*dynamodb.GetItemInput) (*dynamodb.GetItemOutput, error) {
+	return nil, nil
+}
+
 type machineryServerMock struct{}
 
 func (m *machineryServerMock) SendTask(signature *tasks.Signature) (*result.AsyncResult, error) {

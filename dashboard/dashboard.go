@@ -9,7 +9,8 @@ import (
 // Dashboard :noodc:
 type Dashboard interface {
 	FindAllTasksByState(state, cursor string, asc bool, size int64) (taskStates []*TaskWithSignature, next string, err error)
-	RerunTask(sig *tasks.Signature) error
+	RerunTask(uuid string) error
+	FindTaskByUUID(uuid string) (*TaskWithSignature, error)
 }
 
 type machineryServer interface {
@@ -18,4 +19,5 @@ type machineryServer interface {
 
 type dynamoDBClient interface {
 	Query(*dynamodb.QueryInput) (*dynamodb.QueryOutput, error)
+	GetItem(*dynamodb.GetItemInput) (*dynamodb.GetItemOutput, error)
 }

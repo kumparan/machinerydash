@@ -1,7 +1,6 @@
 package server
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -166,9 +165,8 @@ func (s *Server) handleListAllTasksByState(ec echo.Context) error {
 }
 
 func (s *Server) handleRerun(ec echo.Context) error {
-	sig := tasks.Signature{}
 	req := struct {
-		Signature string `json:"signature"`
+		UUID string `json:"uuid"`
 	}{}
 	err := errors.Unwrap(ec.Bind(&req))
 	if err != nil {
@@ -176,15 +174,9 @@ func (s *Server) handleRerun(ec echo.Context) error {
 		return ec.JSON(http.StatusBadRequest, fmtErr("invalid request"))
 	}
 
-	err = json.Unmarshal([]byte(req.Signature), &sig)
+	err = s.machineryDash.RerunTask(req.UUID)
 	if err != nil {
-		logrus.WithField("signature", req.Signature).Error(err)
-		return ec.JSON(http.StatusBadRequest, fmtErr("invalid request"))
-	}
-
-	err = s.machineryDash.RerunTask(&sig)
-	if err != nil {
-		logrus.WithField("signatyre", req.Signature).Error(err)
+		logrus.WithField("uuid", req.UUID).Error(err)
 		return ec.JSON(http.StatusInternalServerError, fmtErr("failed to rerun task"))
 	}
 

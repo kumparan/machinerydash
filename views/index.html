@@ -54,7 +54,7 @@
                 <td>{{ .CreatedAt }}</td>
             <td>
                 {{ if $enableRerun }}
-                    <button type="button" class="btn btn-primary" onclick='rerun({{ .Signature }})'>Rerun</button>
+                    <button type="button" class="btn btn-primary" onclick='rerun("{{ .TaskUUID }}")'>Rerun</button>
                 {{ end }}
             </td>
             </tr>
@@ -67,12 +67,12 @@
     {{ end }}
 
     <script>
-        function rerun(signature) {
+        function rerun(uuid) {
             if (!confirm("Do you want to Rerun the task ?")) {
                 return
             }
 
-            let payload = { signature: JSON.stringify(signature) }
+            let payload = { uuid: uuid }
 
             fetch("/rerun", {
                 method: "POST",

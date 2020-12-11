@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/RichardKnop/machinery/v1/config"
 	"github.com/RichardKnop/machinery/v1/log"
@@ -29,6 +30,14 @@ type TaskWithSignature struct {
 	Signature string `bson:"signature"`
 	CreatedAt string `bson:"created_at"`
 	Error     string `bson:"error"`
+}
+
+// UnmarshalSignature :nodoc:
+func (t *TaskWithSignature) UnmarshalSignature(v interface{}) error {
+	reader := strings.NewReader(t.Signature)
+	dec := json.NewDecoder(reader)
+	dec.UseNumber()
+	return dec.Decode(v)
 }
 
 // NewDynamodb :nodoc:
@@ -122,7 +131,7 @@ func (m *DynamoDB) FindTaskByUUID(uuid string) (*TaskWithSignature, error) {
 			"#err": aws.String("Error"),
 		},
 		Key: map[string]*dynamodb.AttributeValue{
-			":st": {
+			"TaskUUID": {
 				S: aws.String(uuid),
 			},
 		},
@@ -150,7 +159,7 @@ func (m *DynamoDB) RerunTask(uuid string) error {
 	}
 
 	sig := &tasks.Signature{}
-	err = json.Unmarshal([]byte(task.Signature), &sig)
+	err = task.UnmarshalSignature(sig)
 	if err != nil {
 		err = fmt.Errorf("failed to unmarshal: %w", err)
 		return err

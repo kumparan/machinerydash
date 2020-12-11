@@ -33,7 +33,7 @@ func EnableDynamoDBTTL(client *dynamodb.DynamoDB, tableName string, attributeNam
 		TableName: &tableName,
 	})
 	if err != nil {
-		log.Fatal(err)
+		log.WithField("tableName", tableName).Fatal(err)
 	}
 
 	isDynamoDBTTLEnabled := *desc.TimeToLiveDescription.TimeToLiveStatus == dynamodb.TimeToLiveStatusEnabled

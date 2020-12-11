@@ -23,7 +23,7 @@ var jsonSignature = `{
 		{
 			"Name": "userID",
 			"Type": "int64",
-			"Value": 1607416299930351600
+			"Value": 1607416299930351698
 		}
 	],
 	"RetryTimeout": 8
@@ -224,4 +224,21 @@ func Test_FindTaskByUUID(t *testing.T) {
 		assert.Error(t, err)
 		assert.Nil(t, res)
 	})
+}
+
+func Test_Task_UnmarshalSignature(t *testing.T) {
+	ts := TaskWithSignature{Signature: jsonSignature}
+
+	sig := &tasks.Signature{}
+	err := ts.UnmarshalSignature(sig)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, sig.Args)
+
+	// get the real value
+	refVal, err := tasks.ReflectValue(sig.Args[0].Type, sig.Args[0].Value)
+	assert.NoError(t, err)
+	assert.NotNil(t, refVal)
+
+	expectedUserID := int64(1607416299930351698)
+	assert.Equal(t, expectedUserID, refVal.Int())
 }

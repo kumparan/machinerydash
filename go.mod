@@ -4,8 +4,9 @@ go 1.14
 
 require (
 	bou.ke/monkey v1.0.2
-	github.com/RichardKnop/machinery v1.9.2
-	github.com/aws/aws-sdk-go v1.33.6
+	github.com/RichardKnop/machinery v1.10.0
+	// github.com/RichardKnop/machinery v1.10.0 // indirect
+	github.com/aws/aws-sdk-go v1.35.35
 	github.com/banzaicloud/logrus-runtime-formatter v0.0.0-20190729070250-5ae5475bae5e
 	github.com/certifi/gocertifi v0.0.0-20200922220541-2c3bb06c6054 // indirect
 	github.com/evalphobia/logrus_sentry v0.8.2
@@ -19,4 +20,4 @@ require (
 	github.com/stretchr/testify v1.6.1
 )
 
-replace github.com/RichardKnop/machinery => github.com/kumparan/machinery v1.9.3-0.20201202083018-181992f5f0eb
+replace github.com/RichardKnop/machinery => github.com/kumparan/machinery v1.10.1-0.20201218043013-bcb75fc5c120 // dev/v1.9.2

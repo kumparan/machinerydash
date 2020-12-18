@@ -12,7 +12,16 @@ test-only:
 	$(test_command)
 
 lint: check-cognitive-complexity
-	golangci-lint run --print-issued-lines=false --exclude-use-default=false --enable=golint --enable=goimports  --enable=unconvert --enable=unparam --concurrency=2 --timeout=10m
+	golangci-lint run \
+	--print-issued-lines=false \
+	--exclude-use-default=false \
+	--enable=golint \
+	--enable=goimports  \
+	--enable=unconvert \
+	--enable=unparam \
+	--enable=gosec \
+	--concurrency=2 \
+	--timeout=10m 
 
 check-cognitive-complexity:
 	gocognit -over 15 .

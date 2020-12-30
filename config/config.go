@@ -51,8 +51,12 @@ func Port() string {
 }
 
 // DynamoDBHost :nodoc:
-func DynamoDBHost() string {
-	return viper.GetString("dynamodb.host")
+func DynamoDBHost() *string {
+	host := viper.GetString("dynamodb.host")
+	if len(host) == 0 {
+		return nil
+	}
+	return &host
 }
 
 // DynamoDBTaskTable :nodoc:

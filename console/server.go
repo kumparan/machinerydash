@@ -39,7 +39,7 @@ func createMachineryCfg() *machineryConfig.Config {
 	dynamoDBClient := db.NewDynamoDBClient()
 	cfg := &machineryConfig.Config{
 		Broker:        config.MachineryBrokerHost(),
-		ResultBackend: config.DynamoDBHost(),
+		ResultBackend: *config.DynamoDBHost(),
 		DynamoDB: &machineryConfig.DynamoDBConfig{
 			TaskStatesTable: config.DynamoDBTaskTable(),
 			GroupMetasTable: config.DynamoDBGroupTable(),

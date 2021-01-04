@@ -18,7 +18,7 @@ func NewDynamoDBClient() *dynamodb.DynamoDB {
 	var sess *session.Session
 	cfg := &aws.Config{
 		Region:   aws.String(config.DynamoDBAWSRegion()),
-		Endpoint: config.DynamoDBHost(),
+		Endpoint: aws.String(config.DynamoDBHost()), // set this value when using local dynamodb
 		Credentials: credentials.NewStaticCredentials(config.DynamoDBAWSAccessKey(),
 			config.DynamoDBAWSSecretAccess(), ""),
 	}

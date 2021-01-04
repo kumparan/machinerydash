@@ -18,6 +18,7 @@ require (
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.6.1
+	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 )
 
 replace github.com/RichardKnop/machinery => github.com/kumparan/machinery v1.10.1-0.20201218043013-bcb75fc5c120 // dev/v1.9.2

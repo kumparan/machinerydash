@@ -38,8 +38,7 @@ func runServer(cmd *cobra.Command, args []string) {
 func createMachineryCfg() *machineryConfig.Config {
 	dynamoDBClient := db.NewDynamoDBClient()
 	cfg := &machineryConfig.Config{
-		Broker:        config.MachineryBrokerHost(),
-		ResultBackend: *config.DynamoDBHost(),
+		Broker: config.MachineryBrokerHost(),
 		DynamoDB: &machineryConfig.DynamoDBConfig{
 			TaskStatesTable: config.DynamoDBTaskTable(),
 			GroupMetasTable: config.DynamoDBGroupTable(),

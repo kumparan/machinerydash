@@ -2,7 +2,6 @@ env: "development"
 log_level: "debug"
 port: 9000
 dynamodb:
-  host: "$dev_dynamodb_host"
   region: "$dev_dynamodb_region"
   task_table: "$dev_dynamodb_task_table"
   group_table: "$dev_dynamodb_group_table"

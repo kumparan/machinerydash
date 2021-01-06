@@ -38,13 +38,15 @@ func runServer(cmd *cobra.Command, args []string) {
 func createMachineryCfg() *machineryConfig.Config {
 	dynamoDBClient := db.NewDynamoDBClient()
 	cfg := &machineryConfig.Config{
-		Broker:        config.MachineryBrokerHost(),
-		ResultBackend: config.DynamoDBHost(),
+		Broker: config.MachineryBrokerHost(),
 		DynamoDB: &machineryConfig.DynamoDBConfig{
 			TaskStatesTable: config.DynamoDBTaskTable(),
 			GroupMetasTable: config.DynamoDBGroupTable(),
 			Client:          dynamoDBClient,
 		},
+		// machinery uses ResultBackend to determine which backend will be used
+		// see https://github.com/kumparan/machinery/blob/master/v1/factories.go#L178
+		ResultBackend:   "https://dynamodb",
 		DefaultQueue:    config.MachineryBrokerNamespace(), // use namespace as queue
 		ResultsExpireIn: config.MachineryResultExpiry(),
 	}

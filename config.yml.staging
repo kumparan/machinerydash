@@ -2,7 +2,6 @@ env: "staging"
 log_level: "debug"
 port: 9000
 dynamodb:
-  host: "$staging_dynamodb_host"
   region: "$staging_dynamodb_region"
   task_table: "$staging_dynamodb_task_table"
   group_table: "$staging_dynamodb_group_table"

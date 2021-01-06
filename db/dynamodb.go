@@ -18,11 +18,10 @@ func NewDynamoDBClient() *dynamodb.DynamoDB {
 	var sess *session.Session
 	cfg := &aws.Config{
 		Region:   aws.String(config.DynamoDBAWSRegion()),
-		Endpoint: aws.String(config.DynamoDBHost()),
+		Endpoint: aws.String(config.DynamoDBHost()), // set this value when using local dynamodb
 		Credentials: credentials.NewStaticCredentials(config.DynamoDBAWSAccessKey(),
 			config.DynamoDBAWSSecretAccess(), ""),
 	}
-
 	sess = session.Must(session.NewSession(cfg))
 	return dynamodb.New(sess)
 }
@@ -59,4 +58,42 @@ func EnableDynamoDBTTL(client *dynamodb.DynamoDB, tableName string, attributeNam
 	}
 
 	return nil
+}
+
+// AddStateIndex ..
+func AddStateIndex(client *dynamodb.DynamoDB, tableName, attributeName string) {
+	out, err := client.UpdateTable(&dynamodb.UpdateTableInput{
+		AttributeDefinitions: []*dynamodb.AttributeDefinition{
+			{
+				AttributeName: aws.String("State"),
+				AttributeType: aws.String("S"),
+			},
+		},
+		TableName: aws.String(tableName),
+		GlobalSecondaryIndexUpdates: []*dynamodb.GlobalSecondaryIndexUpdate{
+			{
+				Create: &dynamodb.CreateGlobalSecondaryIndexAction{
+					Projection: &dynamodb.Projection{
+						ProjectionType: aws.String("ALL"),
+					},
+					IndexName: aws.String("StateIndex"),
+					KeySchema: []*dynamodb.KeySchemaElement{
+						{
+							AttributeName: aws.String("State"),
+							KeyType:       aws.String("HASH"),
+						},
+					},
+					ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
+						ReadCapacityUnits:  aws.Int64(5),
+						WriteCapacityUnits: aws.Int64(5),
+					},
+				},
+			},
+		},
+	})
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	fmt.Println(out.String())
 }

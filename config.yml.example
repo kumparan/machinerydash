@@ -1,7 +1,7 @@
 env: "development"
 port: 9000
 dynamodb:
-  host: "http://localhost:8000"
+  host: "http://localhost:8000" # usually used on local instance
   region: "asia"
   task_table: "task_table"
   group_table: "group_table"

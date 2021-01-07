@@ -1,0 +1,14 @@
+env: "production"
+log_level: "debug"
+port: 9000
+dynamodb:
+  region: "$prod_dynamodb_region"
+  task_table: "$prod_dynamodb_task_table"
+  group_table: "$prod_dynamodb_group_table"
+  aws_region: "$prod_dynamodb_region"
+  aws_access_key: "$prod_dynamodb_aws_access_key"
+  aws_secret_access: "$prod_dynamodb_aws_secret_access"
+machinery:
+  broker_namespace: "$prod_machinery_broker_namespace"
+  broker_host: "$prod_machinery_broker_host"
+  result_expiry: $prod_machinery_result_expiry # seconds

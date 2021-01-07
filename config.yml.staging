@@ -1,0 +1,14 @@
+env: "staging"
+log_level: "debug"
+port: 9000
+dynamodb:
+  region: "$staging_dynamodb_region"
+  task_table: "$staging_dynamodb_task_table"
+  group_table: "$staging_dynamodb_group_table"
+  aws_region: "$staging_dynamodb_region"
+  aws_access_key: "$staging_dynamodb_aws_access_key"
+  aws_secret_access: "$staging_dynamodb_aws_secret_access"
+machinery:
+  broker_namespace: "$staging_machinery_broker_namespace"
+  broker_host: "$staging_machinery_broker_host"
+  result_expiry: $staging_machinery_result_expiry # seconds

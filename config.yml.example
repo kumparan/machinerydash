@@ -1,0 +1,14 @@
+env: "development"
+port: 9000
+dynamodb:
+  host: "http://localhost:8000" # usually used on local instance
+  region: "asia"
+  task_table: "task_table"
+  group_table: "group_table"
+  aws_region: "asia"
+  aws_access_key: "access_key"
+  aws_secret_access: "secret_access"
+machinery:
+  broker_namespace: "worker-namespace"
+  broker_host: "redis://localhost:6379/3"
+  result_expiry: 3600 # seconds

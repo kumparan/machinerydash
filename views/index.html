@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Machinery Dash</title>
+
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css" >
+
+    <style>
+        pre {
+            overflow-x: auto;
+            white-space: pre-wrap;
+            white-space: -moz-pre-wrap;
+            white-space: -pre-wrap;
+            white-space: -o-pre-wrap;
+            word-wrap: break-word;
+            max-width: 300px;
+        }
+    </style>
+</head>
+<body class="container">
+    <h1>Machinery Dashboard</h1>
+
+    <div style="display: flex;align-items: baseline;justify-content: space-between;">
+        <h2 style="text-transform: capitalize;">{{ .CurrentState }} Task</h2>
+        
+        <div>
+            {{ range .ListStates }}
+                <a style="padding-right: 8px;" href="/?state={{ . }}">{{ . }}</a>
+            {{ end }}
+        </div>
+    </div>
+
+
+    <table class="table">
+        <thead>
+            <th>TaskUUID</th>
+            <th>Task</th>
+            <th>Signature</th>
+            <th>Error</th>
+            <th>CreatedAt</th>
+            <th>Action</th>
+        </thead>
+        
+        <tbody>
+            {{ $enableRerun := .EnableRerun }}
+            {{range .TaskStates}}
+            <tr>
+                <td style="padding:4px; max-width: 100px"><code>{{ .TaskUUID }}</code></td>
+                <td>{{ .TaskName }}</td>
+                <td><pre class="pre-scrollable">{{ .Signature }}</pre></td>
+                <td><code>{{ .Error }}</code></td>
+                <td>{{ .CreatedAt }}</td>
+            <td>
+                {{ if $enableRerun }}
+                    <button type="button" class="btn btn-primary" onclick='rerun("{{ .TaskUUID }}")'>Rerun</button>
+                {{ end }}
+            </td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+
+    {{ if .Cursor }}
+        <a href="/?state={{ .CurrentState }}&next={{ .Cursor }}&size={{ .Size }}">NEXT >></a>
+    {{ end }}
+
+    <script>
+        function rerun(uuid) {
+            if (!confirm("Do you want to Rerun the task ?")) {
+                return
+            }
+
+            let payload = { uuid: uuid }
+
+            fetch("/rerun", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload),
+            })
+            .then(res => res.json())
+            .then(res => {
+                window.location.reload()
+            })
+            .catch(err => {
+                console.error(err)
+            })
+        }
+    </script>
+
+</body>
+</html>
